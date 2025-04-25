@@ -6,7 +6,7 @@
 Ecole Polytechnique Fédérale de Lausanne
 </div> 
 <div align="center">
-EE-490(f): Lab in Signal and Image Processing
+NX-465 Computational Neurosciences : Neuronal Dynamics
 </div> 
 
 # NX-465 Computational Neurosciences : Neuronal Dynamics
