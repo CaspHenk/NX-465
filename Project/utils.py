@@ -1,21 +1,22 @@
 import numpy as np
 from time import time
+import matplotlib.pyplot as plt
 
 
 # 0.1
-def gen_balanced_patterns(p,N) :
+def gen_balanced_patterns(P,N) :
     '''
     Inputs :
-    p : number of patterns
+    P : number of patterns
     N : Size of each pattern (must be odd !)
     
     Outputs :
     patterns : np.ndarray of size (p,N)
     '''
 
-    patterns = np.zeros((p,N), dtype=int)
+    patterns = np.zeros((P,N), dtype=int)
 
-    for i in np.arange(p) :
+    for i in np.arange(P) :
         pattern = np.array([1] * (N // 2) + [-1] * (N // 2))
         np.random.shuffle(pattern)
         patterns[i] = pattern
@@ -60,9 +61,8 @@ def acc_next_state(S : np.ndarray, patterns : np.ndarray) :
 
     Output :
     next_state : np.ndarray of size (N,1) (state of the network at time i+1)
+    m : np.ndarray of size (p,1) (overlap variables for each pattern, useful for ex. 1.1)
     '''
-    
-    p = patterns.shape[0]
     N = patterns.shape[1]
 
     # Compute overlap variables
@@ -70,34 +70,30 @@ def acc_next_state(S : np.ndarray, patterns : np.ndarray) :
     h = patterns.T @ m  # (Nxp) x (px1)
     next_state = np.sign(h)
     
-    return next_state
+    return next_state, m 
 
-
-# 1.1
-def overlap_next_state(S : np.ndarray, patterns : np.ndarray) :
-
-    ''' 
-    Exactly the same function as for 0.3, but here it also returns m
-    Not the most clever way to put it, but at least it separates the
-    two functions for the two exercises (we can rewrite it later if necessary)
-
-
-
+# Ex 1 in general
+def plot_overlap_variables(T : int, m_list : np.ndarray) :
+    '''
+    General plotting function that is used in exercise 1.
+    
     Inputs :
-    S : np.ndarray of size (N,1) (state of the network at time i)
-    patterns : np.ndarray of size (p,N) (patterns that have to be compared to the state)
-
+    - T : number of time steps
+    - m_list : np.ndarray containing each overlap variable for every pattern at each time step,
+    meaning that m_list[i][j] corresponds to the overlap variable of pattern j 
+    at time step i
+    
     Output :
-    next_state : np.ndarray of size (N,1) (state of the network at time i+1)
-    m : np.ndarray of size (p,1) (overlap variables for each pattern)
+    None (plots a figure, but does not return anything)
     '''
-    
-    p = patterns.shape[0]
-    N = patterns.shape[1]
+    plt.figure()
+    for i in np.arange(m_list.shape[1]) :
+        if i == 0 :
+            plt.plot(np.arange(T), m_list[:,i], label='First pattern',color='black')
+        else :
+            plt.plot(np.arange(T), m_list[:,i])
+    plt.grid()
+    plt.title('Overlap variables evolution over time')
+    plt.legend()
+    plt.show()
 
-    # Compute overlap variables
-    m = 1/N * patterns @ S # (pxN) x (Nx1)
-    h = patterns.T @ m  # (Nxp) x (px1)
-    next_state = np.sign(h)
-    
-    return next_state, m
