@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 def gen_balanced_patterns(P,N) :
     '''
     Inputs :
-    P : number of patterns
-    N : Size of each pattern (must be odd !)
+    - P : number of patterns
+    - N : Size of each pattern (must be odd !)
     
     Outputs :
-    patterns : np.ndarray of size (p,N)
+    - patterns : np.ndarray of size (P,N)
     '''
 
     patterns = np.zeros((P,N), dtype=int)
@@ -29,11 +29,12 @@ def next_state(S : np.ndarray, patterns : np.ndarray) :
 
     ''' 
     Inputs :
-    S : np.ndarray of size (N,1) (state of the network at time i)
-    patterns : np.ndarray of size (p,N) (patterns that have to be compared to the state)
+    - S : np.ndarray of size (N,1) (state of the network at time i)
+    - patterns : np.ndarray of size (P,N) (patterns that have to be compared to the state)
 
     Output :
-    next_state : np.ndarray of size (N,1) (state of the network at time i+1)
+    - next_state : np.ndarray of size (N,1) (state of the network at time i+1)
+    - w : np.ndarray of size (N,N) (Hebbian values matrix)
     '''
     
     N = patterns.shape[1]
@@ -48,7 +49,7 @@ def next_state(S : np.ndarray, patterns : np.ndarray) :
     h = w @ S
     next_state = np.sign(h)
     
-    return next_state
+    return next_state, w
 
 
 # 0.3
@@ -56,12 +57,12 @@ def acc_next_state(S : np.ndarray, patterns : np.ndarray) :
 
     ''' 
     Inputs :
-    S : np.ndarray of size (N,1) (state of the network at time i)
-    patterns : np.ndarray of size (p,N) (patterns that have to be compared to the state)
+    - S : np.ndarray of size (N,1) (state of the network at time i)
+    patterns : np.ndarray of size (P,N) (patterns that have to be compared to the state)
 
     Output :
-    next_state : np.ndarray of size (N,1) (state of the network at time i+1)
-    m : np.ndarray of size (p,1) (overlap variables for each pattern, useful for ex. 1.1)
+    - next_state : np.ndarray of size (N,1) (state of the network at time i+1)
+    - m : np.ndarray of size (P,1) (overlap variables for each pattern, useful for ex. 1.1)
     '''
     N = patterns.shape[1]
 
@@ -96,4 +97,30 @@ def plot_overlap_variables(T : int, m_list : np.ndarray) :
     plt.title('Overlap variables evolution over time')
     plt.legend()
     plt.show()
+
+
+# 2.1
+def gen_dilution_mask(N : int):
+
+    """
+    Generate a dilution mask such that each post-synaptic neuron has 0.5N connections.
+
+    Input :
+    - N : int (number of neurons)
+
+    Output :
+    - C : np.ndarray (dilation mask)
+    """
+
+    K = N // 2
+    C = np.zeros((N, N), dtype=int)
+    
+    for j in range(N):
+        # Randomly select K presynaptic neurons to connect to neuron j
+        presynaptic_indices = np.random.choice(N, K, replace=False)
+        C[presynaptic_indices, j] = 1
+        
+    # np.fill_diagonal(C, 0)
+    
+    return C
 
