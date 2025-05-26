@@ -42,9 +42,6 @@ def next_state(S : np.ndarray, patterns : np.ndarray) :
     # Compute weights array (Eq. 1.1), a p x p symmetric array
     w = 1/N * patterns.T @ patterns
 
-    # Diagonal has to be 0, as the sum has to be over odd numbers to avoid getting 0 as a result
-    # Irrelevant as long as you do more than one step
-    # np.fill_diagonal(w, 0)
     # Follow Eq. 1.2 to update state
     h = w @ S
     next_state = np.sign(h)
@@ -102,7 +99,7 @@ def plot_overlap_variables(T : int, m_list : np.ndarray) :
 # 2.1
 def gen_dilution_mask(N : int):
 
-    """
+    '''
     Generate a dilution mask such that each post-synaptic neuron has 0.5N connections.
 
     Input :
@@ -110,7 +107,7 @@ def gen_dilution_mask(N : int):
 
     Output :
     - C : np.ndarray (dilation mask)
-    """
+    '''
 
     K = N // 2
     C = np.zeros((N, N), dtype=int)
@@ -124,9 +121,28 @@ def gen_dilution_mask(N : int):
     
     return C
 
+# 2.2, return overlaps and also next state taking into account the mask
+def overlap_and_next_state(S : np.ndarray, patterns : np.ndarray, C : np.ndarray):
+    ''' 
+    Inputs :
+    - S : np.ndarray of size (N,1) (state of the network at time i)
+    - patterns : np.ndarray of size (P,N) (patterns that have to be compared to the state)
+    - C : np.ndarray of size (N,N) (mask to apply on the Hebbian weights)
 
+    Output :
+    - w : np.ndarray of size (N,N) (Hebbian values matrix)
+    '''
+    N = patterns.shape[1]
+    m = 1/N * patterns @ S # (pxN) x (Nx1)
+    w = 1/N * patterns.T @ patterns
 
+    J = C * w
+    h = J @ S
 
+    next_state = np.sign(h)
+
+    return next_state, m
+    
 
 
 
